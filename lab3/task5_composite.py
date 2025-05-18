@@ -1,3 +1,4 @@
+from collections import deque
 class LightNode:
     def __init__(self, tag=None):
         self.tag = tag
@@ -8,6 +9,22 @@ class LightNode:
 
     def render(self):
         pass
+
+    def dfs(self):
+        yield self
+        for child in self.children:
+            yield from child.dfs()
+
+    def bfs(self):
+        queue = deque([self])
+        while queue:
+            node = queue.popleft()
+            yield node
+            queue.extend(node.children)
+
+    #Простий приклад використання
+    #for node in root.bfs():
+    #print(node.tag)
 
 class LightElementNode(LightNode):
     def __init__(self, tag, is_block=True, is_self_closing=False):
