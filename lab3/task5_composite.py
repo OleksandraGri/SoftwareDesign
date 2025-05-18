@@ -29,3 +29,37 @@ class LightTextNode(LightNode):
 
     def render(self):
         print(self.text)
+
+class DOMCommand:
+    def execute(self):
+        pass
+
+    def undo(self):
+        pass
+
+class AddElementCommand(DOMCommand):
+    def __init__(self, parent, child):
+        self.parent = parent
+        self.child = child
+        self.position = None
+
+    def execute(self):
+        self.position = len(self.parent.children)
+        self.parent.add_child(self.child)
+
+    def undo(self):
+        if self.position is not None:
+            self.parent.children.pop(self.position)
+
+class DOMInvoker:
+    def __init__(self):
+        self.history = []
+
+    def execute(self, command):
+        command.execute()
+        self.history.append(command)
+
+    def undo(self):
+        if self.history:
+            command = self.history.pop()
+            command.undo()
