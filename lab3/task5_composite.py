@@ -9,6 +9,9 @@ class LightNode:
     def render(self):
         pass
 
+    def accept(self, visitor):
+        pass
+
 class LightElementNode(LightNode):
     def __init__(self, tag, is_block=True, is_self_closing=False):
         super().__init__(tag)
@@ -22,6 +25,11 @@ class LightElementNode(LightNode):
         if not self.is_self_closing:
             print(f"</{self.tag}>")
 
+    def accept(self, visitor):
+        visitor.visit_element(self)
+        for child in self.children:
+            child.accept(visitor)
+
 class LightTextNode(LightNode):
     def __init__(self, text):
         super().__init__()
@@ -29,3 +37,27 @@ class LightTextNode(LightNode):
 
     def render(self):
         print(self.text)
+
+    def accept(self, visitor):
+        visitor.visit_text(self)
+        
+class NodeVisitor:
+    def visit_element(self, element):
+        pass
+
+    def visit_text(self, text):
+        pass
+
+class StatsVisitor(NodeVisitor):
+    def __init__(self):
+        self.element_count = 0
+        self.text_count = 0
+        self.total_chars = 0
+
+    def visit_element(self, element):
+        self.element_count += 1
+
+    def visit_text(self, text):
+        self.text_count += 1
+        self.total_chars += len(text.text)
+
