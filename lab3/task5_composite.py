@@ -10,10 +10,10 @@ class LightNode:
         pass
 
 class LightElementNode(LightNode):
-    def __init__(self, tag, is_block=True, is_self_closing=False):
-        super().__init__(tag)
-        self.is_block = is_block
-        self.is_self_closing = is_self_closing
+    def __init__(self, tag):
+        super().__init__()
+        self.tag = tag
+        self._state = VisibleState()
 
     def render(self):
         print(f"<{self.tag}>")
@@ -22,6 +22,12 @@ class LightElementNode(LightNode):
         if not self.is_self_closing:
             print(f"</{self.tag}>")
 
+    def set_state(self, state):
+        self._state = state
+
+    def _render_impl(self):
+        self._state.render(self)
+
 class LightTextNode(LightNode):
     def __init__(self, text):
         super().__init__()
@@ -29,3 +35,19 @@ class LightTextNode(LightNode):
 
     def render(self):
         print(self.text)
+
+class ElementState:
+    def render(self, node):
+        pass
+
+class VisibleState(ElementState):
+    def render(self, node):
+        print(f"<{node.tag}>")
+        for child in node.children:
+            child.render()
+            print(f"</{node.tag}>")
+
+class HiddenState(ElementState):
+    def render(self, node):
+        print(f"<!-- {node.tag} (hidden) -->")
+
